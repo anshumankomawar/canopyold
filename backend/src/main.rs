@@ -4,7 +4,6 @@ mod error;
 mod database;
 mod models;
 
-
 use routes::create_routes;
 use app_state::AppState;
 use database::get_postgres_pool;

@@ -21,7 +21,6 @@ pub enum Error {
     QueryError { error: sqlx::Error },
 }
 
-
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
         tracing::error!("Error: {self:?}");

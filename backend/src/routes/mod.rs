@@ -1,4 +1,5 @@
 pub mod topic;
+pub mod resource;
 
 use axum::{
     body::Body, 
@@ -13,7 +14,10 @@ use crate::app_state;
 pub fn create_routes(state: app_state::AppState) -> Router<(), Body> {
     let unprotected_routes = Router::new()
         .route("/", get(|| async { "Hello, world!" }))
-        .route("/topic/create", post(topic::create));
+        .route("/topic/create", post(topic::create))
+        .route("/resource/api/create", post(resource::create_api_resource))
+        .route("/resource/online/create", post(resource::create_online_resource));
+
 
     Router::new()
         .merge(unprotected_routes)

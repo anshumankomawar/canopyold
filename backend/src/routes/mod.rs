@@ -1,10 +1,19 @@
-use axum::{body::Body, Router, routing::get, http::StatusCode, response::{Response, IntoResponse}, middleware::map_response};
+pub mod topic;
 
+use axum::{
+    body::Body, 
+    Router, 
+    routing::{get, post},
+    http::StatusCode,
+    response::{Response, IntoResponse},
+    middleware::map_response
+};
 use crate::app_state;
 
 pub fn create_routes(state: app_state::AppState) -> Router<(), Body> {
     let unprotected_routes = Router::new()
-        .route("/", get(|| async { "Hello, world!" }));
+        .route("/", get(|| async { "Hello, world!" }))
+        .route("/topic/create", post(topic::create));
 
     Router::new()
         .merge(unprotected_routes)
@@ -19,5 +28,5 @@ async fn main_response_mapper(res: Response) -> Response {
 }
 
 async fn handler_404() -> impl IntoResponse {
-    (StatusCode::NOT_FOUND, "nothing to see here")
+    (StatusCode::NOT_FOUND, "No route found")
 }

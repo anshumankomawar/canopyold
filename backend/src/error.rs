@@ -25,7 +25,9 @@ impl IntoResponse for Error {
     fn into_response(self) -> Response {
         tracing::error!("Error: {self:?}");
         match self {
-            Error::QueryError { error } => (StatusCode::UNAUTHORIZED, format!("QueryError: {:?}", error)).into_response(),
+            Error::QueryError { error } => {
+                (StatusCode::UNAUTHORIZED, format!("QueryError: {:?}", error)).into_response()
+            }
         }
     }
 }

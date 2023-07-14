@@ -7,7 +7,7 @@
 use sqlx::postgres::PgPool;
 #[derive(Debug, Clone)]
 pub struct AppState {
-    pub pg_pool: PgPool
+    pub pg_pool: PgPool,
 }
 
 impl AppState {

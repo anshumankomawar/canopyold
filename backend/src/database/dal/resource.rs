@@ -1,7 +1,9 @@
-use sqlx::{query, postgres::PgPool};
+use sqlx::{postgres::PgPool, query};
 
-use crate::error::{Result, Error};
-use crate::models::resource::{ApiResourceCreatePayload, OnlineResourceCreatePayload, ApiResourceTable, OnlineResourceTable};
+use crate::error::{Error, Result};
+use crate::models::resource::{
+    ApiResourceCreatePayload, ApiResourceTable, OnlineResourceCreatePayload, OnlineResourceTable,
+};
 
 impl ApiResourceTable {
     pub async fn create(pool: PgPool, payload: &ApiResourceCreatePayload) -> Result<String> {
@@ -14,7 +16,10 @@ impl ApiResourceTable {
             payload.method,
             payload.path,
             payload.description
-        ).execute(&pool).await {
+        )
+        .execute(&pool)
+        .await
+        {
             Ok(_) => Ok("Api resource created successfully".to_string()),
             Err(e) => {
                 tracing::error!("Error creating api resource: {:?}", e);
@@ -34,7 +39,10 @@ impl OnlineResourceTable {
             payload.topic_id,
             payload.url,
             payload.description
-        ).execute(&pool).await {
+        )
+        .execute(&pool)
+        .await
+        {
             Ok(_) => Ok("Online resource created successfully".to_string()),
             Err(e) => {
                 tracing::error!("Error creating online resource: {:?}", e);

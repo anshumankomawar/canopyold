@@ -1,2 +1,2 @@
-pub mod topic;
 pub mod resource;
+pub mod topic;

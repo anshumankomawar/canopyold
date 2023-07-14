@@ -11,8 +11,8 @@ pub async fn create(
     State(state): State<AppState>,
     payload: Json<TopicCreatePayload>,
 ) -> Result<Json<Value>> {
-    tracing::info!("HANDLER -> {:<12}", "users/create");
-    match TopicTable::create(state.pg_pool, &payload).await {
+    tracing::info!("HANDLER -> {:<12}", "topics/create");
+    match TopicTable::create(state, &payload).await {
         Ok(result) => {
             let response = Json(json!({ "result": result }));
             Ok(response)
@@ -26,7 +26,7 @@ pub async fn get_resources(
     State(state): State<AppState>,
     payload: Json<TopicResourceGetPayload>,
 ) -> Result<Json<Value>> {
-    tracing::info!("HANDLER -> {:<12}", "users/get_resources");
+    tracing::info!("HANDLER -> {:<12}", "topics/get_resources");
     match TopicTable::get_resources(state.pg_pool, &payload).await {
         Ok((api, online)) => {
             let response = Json(json!({ "api": api, "online": online }));

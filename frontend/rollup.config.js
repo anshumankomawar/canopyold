@@ -32,6 +32,11 @@ function serve() {
 export default {
 	input: 'src/main.js',
 	output: {
+		globals: {
+			'/components/ResultList.svelte': 'ResultList',
+			'/components/FilterPane.svelte': 'FilterPane',
+			'/components/SearchBar.svelte': 'SearchBar'
+		},
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',

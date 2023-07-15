@@ -67,12 +67,11 @@ impl SearchEngine {
 pub fn get_search_engine() -> SearchEngine {
     let mut schema_builder = SchemaBuilder::new();
     let topic_id = schema_builder.add_u64_field("topic_id", STORED);
-    let topic_name = schema_builder.add_text_field("topic_name", TEXT);
+    let topic_name = schema_builder.add_text_field("topic_name", TEXT | STORED);
     let topic_description = schema_builder.add_text_field("topic_description", TEXT);
 
     let index_options = TextFieldIndexing::default().set_index_option(IndexRecordOption::WithFreqs);
     let text_options = TextOptions::default()
-        .set_stored()
         .set_indexing_options(index_options);
     let topic_body = schema_builder.add_json_field("topic_body", text_options);
 

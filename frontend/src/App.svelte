@@ -1,5 +1,7 @@
 <!-- App.svelte -->
   <script>
+	import { Router, Route } from 'svelte-routing';
+  	import Doc from './components/doc/Doc.svelte';
 	import SearchBar from './components/SearchBar.svelte';
 	import ResultList from './components/ResultList.svelte';
 	import FilterPane from './components/FilterPane.svelte';
@@ -16,6 +18,10 @@
 	}
     
   </script>
+
+  <Router>
+	<Route path="/docs/:title" component={Doc} />
+  </Router>
   
   <div id="App">
     <header>

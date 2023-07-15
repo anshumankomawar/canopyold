@@ -1,4 +1,5 @@
 use std::path::Path;
+use tantivy::schema::{IndexRecordOption, TextFieldIndexing, TextOptions};
 use tantivy::DocAddress;
 use tantivy::{
     collector::TopDocs,
@@ -10,6 +11,7 @@ use tantivy::{
 use tantivy::{directory::MmapDirectory, schema::Field};
 
 use crate::error::{Error, Result};
+use crate::models::topic::TopicTable;
 
 #[derive(Clone)]
 pub struct SearchEngine {
@@ -17,12 +19,13 @@ pub struct SearchEngine {
     pub reader: IndexReader,
     pub schema: Schema,
     pub fields: Vec<Field>,
+    pub query_fields: Vec<Field>,
 }
 
 impl SearchEngine {
     pub fn search(&self, query: &str) -> Result<Vec<(Score, DocAddress)>> {
-        let query_parser = QueryParser::for_index(&self.index, self.fields.clone());
-        let query = match query_parser.parse_query(&format!("{}*", query).to_string()) {
+        let query_parser = QueryParser::for_index(&self.index, self.query_fields.clone());
+        let query = match query_parser.parse_query(query) {
             Ok(query) => query,
             Err(e) => return Err(Error::QueryParseError { error: e }),
         };
@@ -43,11 +46,13 @@ impl SearchEngine {
         results
     }
 
-    pub fn add_document(&self, topic: &str) -> Result<()> {
+    pub fn add_document(&self, topic: TopicTable) -> Result<()> {
         let mut index_writer = self.index.writer(50_000_000).unwrap();
         let doc = doc!(
-            self.fields[0] => topic,
-            self.fields[1] => "",
+            self.fields[0] => topic.id,
+            self.fields[1] => topic.name.to_string(),
+            self.fields[2] => topic.description.to_string(),
+            self.fields[3] => topic.get_components_json(),
         );
         match index_writer.add_document(doc) {
             Ok(_) => match index_writer.commit() {
@@ -61,8 +66,16 @@ impl SearchEngine {
 
 pub fn get_search_engine() -> SearchEngine {
     let mut schema_builder = SchemaBuilder::new();
-    let topics = schema_builder.add_text_field("topics", TEXT | STORED);
-    let resources = schema_builder.add_text_field("resources", TEXT);
+    let topic_id = schema_builder.add_u64_field("topic_id", STORED);
+    let topic_name = schema_builder.add_text_field("topic_name", TEXT);
+    let topic_description = schema_builder.add_text_field("topic_description", TEXT);
+
+    let index_options = TextFieldIndexing::default().set_index_option(IndexRecordOption::WithFreqs);
+    let text_options = TextOptions::default()
+        .set_stored()
+        .set_indexing_options(index_options);
+    let topic_body = schema_builder.add_json_field("topic_body", text_options);
+
     let schema = schema_builder.build();
 
     if !Path::new("index").exists() {
@@ -81,6 +94,7 @@ pub fn get_search_engine() -> SearchEngine {
         index,
         reader,
         schema,
-        fields: vec![topics, resources],
+        fields: vec![topic_id, topic_name, topic_description, topic_body],
+        query_fields: vec![topic_name, topic_description, topic_body],
     }
 }

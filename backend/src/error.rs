@@ -1,5 +1,6 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
+use tantivy::query::QueryParserError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -19,13 +20,35 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
     QueryError { error: sqlx::Error },
+    QueryParseError { error: QueryParserError },
+    SearchError { error: tantivy::TantivyError },
+    IndexError { error: tantivy::TantivyError },
 }
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
         tracing::error!("Error: {self:?}");
         match self {
-            Error::QueryError { error } => (StatusCode::UNAUTHORIZED, format!("QueryError: {:?}", error)).into_response(),
+            Error::QueryError { error } => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("QueryError: {:?}", error),
+            )
+                .into_response(),
+            Error::SearchError { error } => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("SearchError: {:?}", error),
+            )
+                .into_response(),
+            Error::IndexError { error } => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("IndexError: {:?}", error),
+            )
+                .into_response(),
+            Error::QueryParseError { error } => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("QueryParseError: {:?}", error),
+            )
+                .into_response(),
         }
     }
 }

@@ -1,9 +1,11 @@
 pub mod search;
 pub mod topic;
+pub mod bdoc;
 
 use crate::app_state;
 use crate::routes::search::search_topic;
-use crate::routes::topic::create;
+use crate::routes::topic::create_topic;
+use crate::routes::bdoc::{create_bdoc, get_bdoc};
 use axum::middleware::map_response;
 use axum::{
     body::Body,
@@ -16,8 +18,10 @@ use axum::{
 pub fn create_routes(state: app_state::AppState) -> Router<(), Body> {
     let unprotected_routes = Router::new()
         .route("/", get(|| async { "Hello, world!" }))
-        .route("/topic/create", post(create))
-        .route("/search/topic", post(search_topic));
+        .route("/topic/create", post(create_topic))
+        .route("/search/topic", post(search_topic))
+        .route("/bdoc/create", post(create_bdoc))
+        .route("/bdoc/get", post(get_bdoc));
 
     Router::new()
         .merge(unprotected_routes)

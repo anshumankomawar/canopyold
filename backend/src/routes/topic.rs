@@ -7,7 +7,7 @@ use axum::{extract::State, response::Json};
 use serde_json::{json, Value};
 
 #[axum_macros::debug_handler]
-pub async fn create(
+pub async fn create_topic(
     State(state): State<AppState>,
     payload: Json<TopicCreatePayload>,
 ) -> Result<Json<Value>> {

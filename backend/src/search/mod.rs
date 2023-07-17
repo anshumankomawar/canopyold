@@ -23,9 +23,13 @@ pub struct SearchEngine {
 }
 
 impl SearchEngine {
+    fn prefix_field(field: String, query: &str) -> String {
+        format!("{}:{}", field, query)
+    }
+
     pub fn search(&self, query: &str) -> Result<Vec<(Score, DocAddress)>> {
         let query_parser = QueryParser::for_index(&self.index, self.query_fields.clone());
-        let query = match query_parser.parse_query(query) {
+        let query = match query_parser.parse_query(&Self::prefix_field("Paragraph.content".to_string(), query)) {
             Ok(query) => query,
             Err(e) => return Err(Error::QueryParseError { error: e }),
         };
@@ -81,7 +85,9 @@ pub fn get_search_engine() -> SearchEngine {
         std::fs::create_dir("index").unwrap();
     }
     let dir = MmapDirectory::open("index").unwrap();
+    println!("Opening index...");
     let index = Index::open_or_create(dir, schema.clone()).unwrap();
+    println!("Index: {:?}", index);
 
     let reader = index
         .reader_builder()

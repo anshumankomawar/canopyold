@@ -1,11 +1,11 @@
+pub mod bdoc;
 pub mod search;
 pub mod topic;
-pub mod bdoc;
 
 use crate::app_state;
+use crate::routes::bdoc::{create_bdoc, get_bdoc, save_bdoc};
 use crate::routes::search::search_topic;
 use crate::routes::topic::create_topic;
-use crate::routes::bdoc::{create_bdoc, get_bdoc};
 use axum::middleware::map_response;
 use axum::{
     body::Body,
@@ -21,7 +21,8 @@ pub fn create_routes(state: app_state::AppState) -> Router<(), Body> {
         .route("/topic/create", post(create_topic))
         .route("/search/topic", post(search_topic))
         .route("/bdoc/create", post(create_bdoc))
-        .route("/bdoc/get", post(get_bdoc));
+        .route("/bdoc/get/:id", post(get_bdoc))
+        .route("/bdoc/save/:id", post(save_bdoc));
 
     Router::new()
         .merge(unprotected_routes)

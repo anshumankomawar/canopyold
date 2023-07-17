@@ -19,6 +19,6 @@ pub struct BdocCreatePayload {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct BdocGetPayload {
-    pub id: i64,
+pub struct BdocSavePayload {
+    pub content: String,
 }

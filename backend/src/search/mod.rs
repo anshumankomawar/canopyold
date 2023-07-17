@@ -29,7 +29,9 @@ impl SearchEngine {
 
     pub fn search(&self, query: &str) -> Result<Vec<(Score, DocAddress)>> {
         let query_parser = QueryParser::for_index(&self.index, self.query_fields.clone());
-        let query = match query_parser.parse_query(&Self::prefix_field("Paragraph.content".to_string(), query)) {
+        let query = match query_parser
+            .parse_query(&Self::prefix_field("Paragraph.content".to_string(), query))
+        {
             Ok(query) => query,
             Err(e) => return Err(Error::QueryParseError { error: e }),
         };
@@ -75,8 +77,7 @@ pub fn get_search_engine() -> SearchEngine {
     let topic_description = schema_builder.add_text_field("topic_description", TEXT);
 
     let index_options = TextFieldIndexing::default().set_index_option(IndexRecordOption::WithFreqs);
-    let text_options = TextOptions::default()
-        .set_indexing_options(index_options);
+    let text_options = TextOptions::default().set_indexing_options(index_options);
     let topic_body = schema_builder.add_json_field("topic_body", text_options);
 
     let schema = schema_builder.build();

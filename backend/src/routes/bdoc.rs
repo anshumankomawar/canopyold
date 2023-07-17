@@ -1,7 +1,7 @@
 use crate::{
     app_state::AppState,
     error::Result,
-    models::bdoc::{BdocCreatePayload, BdocSavePayload, BdocTable},
+    models::bdoc::{BdocCreatePayload, BdocSavePayload, BdocTable, BdocDirTable, BdocDirCreatePayload},
 };
 use axum::{
     extract::{Path, State},
@@ -44,6 +44,30 @@ pub async fn save_bdoc(
 ) -> Result<Json<Value>> {
     tracing::info!("HANDLER -> {:<12}", "bdoc/save");
     match BdocTable::save(state, id, &payload).await {
+        Ok(result) => {
+            let response = Json(json!({ "result": result }));
+            Ok(response)
+        }
+        Err(e) => Err(e),
+    }
+}
+
+#[axum_macros::debug_handler]
+pub async fn create_bdoc_dir(State(state): State<AppState>, payload: Json<BdocDirCreatePayload>) -> Result<Json<Value>> {
+    tracing::info!("HANDLER -> {:<12}", "bdoc/dir/create");
+    match BdocDirTable::create(state, &payload).await {
+        Ok(result) => {
+            let response = Json(json!({ "result": result }));
+            Ok(response)
+        }
+        Err(e) => Err(e),
+    }
+}
+
+#[axum_macros::debug_handler]
+pub async fn get_bdoc_dir_contents(Path(id): Path<i64>, State(state): State<AppState>) -> Result<Json<Value>> {
+    tracing::info!("HANDLER -> {:<12}", "bdoc/dir/get");
+    match BdocDirTable::get_contents(state, id).await {
         Ok(result) => {
             let response = Json(json!({ "result": result }));
             Ok(response)

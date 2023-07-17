@@ -10,10 +10,10 @@ impl BdocTable {
         match query!(
             r#"
                 INSERT INTO BDocuments (name, directory_id, content) 
-                VALUES ($1, 1, $2)
+                VALUES ($1, $2, $3)
             "#,
             payload.name,
-            //payload.bdoc_dir_id,
+            payload.bdoc_dir_id,
             payload.content
         )
         .execute(pool)

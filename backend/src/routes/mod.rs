@@ -5,7 +5,7 @@ pub mod topic;
 use std::time::Duration;
 
 use crate::app_state;
-use crate::routes::bdoc::{create_bdoc, get_bdoc, save_bdoc};
+use crate::routes::bdoc::{create_bdoc, create_bdoc_dir, get_bdoc, get_bdoc_dir_contents, save_bdoc};
 use crate::routes::search::search_topic;
 use crate::routes::topic::create_topic;
 use axum::middleware::map_response;
@@ -25,7 +25,9 @@ pub fn create_routes(state: app_state::AppState) -> Router<(), Body> {
         .route("/search/topic", post(search_topic))
         .route("/bdoc/create", post(create_bdoc))
         .route("/bdoc/get/:id", get(get_bdoc))
-        .route("/bdoc/save/:id", post(save_bdoc));
+        .route("/bdoc/save/:id", post(save_bdoc))
+        .route("/bdoc_dir/create", post(create_bdoc_dir))
+        .route("/bdoc_dir/contents/:id", get(get_bdoc_dir_contents));
 
     Router::new()
         .merge(routes)
